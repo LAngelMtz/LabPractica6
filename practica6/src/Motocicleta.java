@@ -6,6 +6,8 @@ public class Motocicleta extends Vehiculo{
         this.tipoMotor = tipoMotor;
     }
 
+    public String getTipoMotor() {return tipoMotor;}
+
     public String mostrarInformacion(){
         return super.mostrarInformacion() + "Tipo: Motocicleta, Tipo de Motor: " + tipoMotor;
     }

@@ -6,6 +6,8 @@ public class Camion extends Vehiculo{
         this.capacidadCarga = capacidadCarga;
     }
 
+    public double getCapacidadCarga() {return capacidadCarga;}
+
     public String mostrarInformacion(){
         return super.mostrarInformacion() + "Tipo: Camion, Capacidad de carga: " + capacidadCarga;
     }

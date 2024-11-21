@@ -15,6 +15,10 @@ public class Vehiculo implements Serializable {
     }
 
     protected int getId(){return id;}
+    protected void setId(int id){this.id = id;}
+    protected String getMarca(){return marca;}
+    protected String getModelo(){return modelo;}
+    protected int getYearFrabricacion(){return yearFrabricacion;}
 
     public String mostrarInformacion(){
         return "ID: " + id + ", Marca: "+marca + ", Modelo: " + modelo + ", año de fabricacion: " + yearFrabricacion +", ";

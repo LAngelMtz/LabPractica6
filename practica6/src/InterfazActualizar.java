@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.util.ArrayList;
 
-public class InterfazCrear {
+public class InterfazActualizar {
     private int opcion;
     private ArrayList<Vehiculo> listaVehiculos;
     private JLabel labelMarca;
@@ -19,11 +19,16 @@ public class InterfazCrear {
     private JTextField textCapacidadCarga;
     private JButton botonConfirmar;
     private JButton botonLimpiar;
+    private JLabel labelBuscar;
+    private JTextField textBuscar;
+    private JButton botonBuscar;
+    private int idMod;
 
-    public InterfazCrear(JPanel panel) {
+    public InterfazActualizar(JPanel panel) {
         definirElementos();
         agregarPanel(panel);
         setVisible(false);
+        setVisibleModificar(false);
     }
 
     private void definirElementos(){
@@ -42,8 +47,11 @@ public class InterfazCrear {
         textTipoMotor = new JTextField();
         capacidadCarga = new JLabel("Capacidad de carga:");
         textCapacidadCarga = new JTextField();
-        botonConfirmar = new JButton("Confirmar");
+        botonConfirmar = new JButton("Modificar");
         botonLimpiar = new JButton("Limpiar");
+        labelBuscar = new JLabel("ID:");
+        textBuscar = new JTextField();
+        botonBuscar = new JButton("Buscar");
 
         botonConfirmar.addActionListener(e -> { // Accion del boton de confirmar o registrar vehiculo
             try{
@@ -51,6 +59,7 @@ public class InterfazCrear {
                 String modelo = textModelo.getText();
                 int year = Integer.parseInt(textYear.getText());
 
+                listaVehiculos.removeIf(v -> v.getId() == idMod); // Remover el objeto original
                 switch (opcion){
                     case 1: // Caso auto
                         int cantPuertas = (int) cantidadPuertas.getValue();
@@ -65,7 +74,9 @@ public class InterfazCrear {
                         listaVehiculos.add(new Camion(marca, modelo, year, carga));
                         break;
                 }
-                JOptionPane.showMessageDialog(null,"Se ha registrado exitosamente!", "Confirmacion", JOptionPane.INFORMATION_MESSAGE);
+                listaVehiculos.getLast().setId(idMod);
+                listaVehiculos.sort((v1,v2) -> Integer.compare(v1.getId(),v2.getId()));
+                JOptionPane.showMessageDialog(null,"Se ha modificado exitosamente!", "Confirmacion", JOptionPane.INFORMATION_MESSAGE);
                 limpiar();
             }catch (Exception ex){
                 JOptionPane.showMessageDialog(null,"Campo nulo o error en formato de numero", "Error", JOptionPane.ERROR_MESSAGE);
@@ -75,6 +86,43 @@ public class InterfazCrear {
 
         botonLimpiar.addActionListener(e -> {
             limpiar();
+        });
+
+        botonBuscar.addActionListener(e -> {
+            try{
+                int buscarId = Integer.parseInt(textBuscar.getText());
+
+                listaVehiculos.stream().filter(v -> v.getId() == buscarId).findFirst().ifPresentOrElse(v -> {
+                    // El ID es encontrado
+                    setVisibleModificar(true);
+                    setVisible(false);
+                    idMod = buscarId;
+
+                    textMarca.setText(v.getMarca());
+                    textModelo.setText(v.getModelo());
+                    textYear.setText(""+v.getYearFrabricacion());
+
+                    // Define si es un auto, moto, camion
+                    if(v instanceof Auto){
+                        opcion = 1;
+                        cantidadPuertas.setValue(((Auto) v).getCantidadPuertas());
+                    } else if (v instanceof Motocicleta) {
+                        opcion = 2;
+                        textTipoMotor.setText(((Motocicleta) v).getTipoMotor());
+                    } else if (v instanceof Camion) {
+                        opcion = 3;
+                        textCapacidadCarga.setText(""+((Camion) v).getCapacidadCarga());
+                    }
+                    activar(opcion);
+
+                        },
+                        // Caso de no encontrar el ID
+                        () -> JOptionPane.showMessageDialog(null,"No se ha encontrado el ID", "Error", JOptionPane.INFORMATION_MESSAGE));
+            }catch (Exception ex){
+                // Caso de error al introducir ID
+                JOptionPane.showMessageDialog(null,"Campo nulo o error en formato de numero", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
         });
     }
     private void agregarPanel(JPanel panel) {
@@ -92,6 +140,9 @@ public class InterfazCrear {
         panel.add(textCapacidadCarga);
         panel.add(botonConfirmar);
         panel.add(botonLimpiar);
+        panel.add(labelBuscar);
+        panel.add(textBuscar);
+        panel.add(botonBuscar);
 
         int altura = 25;
 
@@ -102,6 +153,7 @@ public class InterfazCrear {
         labelPuertas.setBounds(30,115,120,altura);
         tipoMotor.setBounds(30,150,120,altura);
         capacidadCarga.setBounds(30,185,120,altura);
+        labelBuscar.setBounds(30,100,30,altura);
 
         // Posiciones de los text fields
         textMarca.setBounds(150,10,120,altura);
@@ -110,13 +162,21 @@ public class InterfazCrear {
         cantidadPuertas.setBounds(150,115,120,altura);
         textTipoMotor.setBounds(150,150,120,altura);
         textCapacidadCarga.setBounds(150,185,120,altura);
+        textBuscar.setBounds(60,100,120,altura);
 
         // Posiciones botones
         botonConfirmar.setBounds(40,230,100,altura);
         botonLimpiar.setBounds(160,230,100,altura);
+        botonBuscar.setBounds(185,100,75,altura);
     }
 
     public void setVisible(boolean visible) {
+        labelBuscar.setVisible(visible);
+        textBuscar.setVisible(visible);
+        botonBuscar.setVisible(visible);
+    }
+
+    public void setVisibleModificar(boolean visible){
         labelMarca.setVisible(visible);
         textMarca.setVisible(visible);
         labelModelo.setVisible(visible);
@@ -131,6 +191,11 @@ public class InterfazCrear {
         textCapacidadCarga.setVisible(visible);
         botonConfirmar.setVisible(visible);
         botonLimpiar.setVisible(visible);
+    }
+
+    public void setVisibleTodo(boolean visible){
+        setVisible(visible);
+        setVisibleModificar(visible);
     }
 
     public void activar(int opcion){
@@ -169,6 +234,4 @@ public class InterfazCrear {
     public void definirLista(ArrayList<Vehiculo> listaVehiculos) {
         this.listaVehiculos = listaVehiculos;
     }
-
-    public ArrayList<Vehiculo> getListaVehiculos() {return listaVehiculos;}
 }

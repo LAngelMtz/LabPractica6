@@ -15,6 +15,8 @@ public class Ventana extends JFrame implements ActionListener {
     private JMenuItem menuGuardar;
     private InterfazCrear interfazCrear;
     private InterfazLeer interfazLeer;
+    private InterfazActualizar interfazActualizar;
+    private InterfazEliminar interfazEliminar;
     private ArrayList<Vehiculo> listaVehiculos;
     private JLabel labelTipo;
     private JButton botonAuto;
@@ -84,6 +86,8 @@ public class Ventana extends JFrame implements ActionListener {
         // Crear interfaz
         interfazCrear = new InterfazCrear(panel);
         interfazLeer = new InterfazLeer(panel);
+        interfazActualizar = new InterfazActualizar(panel);
+        interfazEliminar = new InterfazEliminar(panel);
 
         ocultarTodo();
     }
@@ -103,6 +107,8 @@ public class Ventana extends JFrame implements ActionListener {
         botonCamion.setVisible(false);
         interfazCrear.setVisible(false);
         interfazLeer.setVisible(false);
+        interfazActualizar.setVisibleTodo(false);
+        interfazEliminar.setVisible(false);
     }
 
     private void cargarLista(){
@@ -118,6 +124,10 @@ public class Ventana extends JFrame implements ActionListener {
                 ObjectInputStream input = new ObjectInputStream(fileStream);
                 listaVehiculos = (ArrayList<Vehiculo>) input.readObject();
                 input.close();
+
+                if(!listaVehiculos.isEmpty()){
+                    Vehiculo.idGlobal = listaVehiculos.getLast().getId();
+                }
 
             }catch (Exception e){
                 JOptionPane.showMessageDialog(null,"Error al cargar el archivo", "Error Detectado", JOptionPane.ERROR_MESSAGE);
@@ -140,10 +150,18 @@ public class Ventana extends JFrame implements ActionListener {
             interfazLeer.setVisible(true);
             interfazLeer.definirLista(listaVehiculos);
         }
-        else if (evento.getSource() == menuActualizar) {}
-        else if (evento.getSource() == menuEliminar) {}
+        else if (evento.getSource() == menuActualizar) {
+            ocultarTodo();
+            interfazActualizar.definirLista(listaVehiculos);
+            interfazActualizar.setVisible(true);
+        }
+        else if (evento.getSource() == menuEliminar) {
+            ocultarTodo();
+            interfazEliminar.definirLista(listaVehiculos);
+            interfazEliminar.setVisible(true);
+        }
         else if (evento.getSource() == menuGuardar) {
-            if(!listaVehiculos.isEmpty()){
+            if(!listaVehiculos.isEmpty() || true){
                 try{
                     // Hoja
                     FileOutputStream file = new FileOutputStream("guardado.txt");

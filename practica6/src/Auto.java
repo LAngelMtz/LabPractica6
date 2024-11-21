@@ -6,6 +6,8 @@ public class Auto extends Vehiculo{
         this.cantidadPuertas = cantidadPuertas;
     }
 
+    public int getCantidadPuertas() {return cantidadPuertas;}
+
     public String mostrarInformacion(){
         return super.mostrarInformacion()+"Tipo: Auto, Cantidad de puertas: "+cantidadPuertas;
     }
